@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:myshop/providers/products.dart';
-import 'package:myshop/screens/product_detail_screen.dart';
 import 'package:provider/provider.dart';
+import '/providers/orders.dart';
 import '/screens/product_overview_screen.dart';
+import '/screens/product_detail_screen.dart';
+import '/screens/cart_screen.dart';
+import '/providers/Cart.dart';
+import '/providers/products.dart';
+import './screens/orders_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,22 +15,33 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => Products(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Shop App',
-        theme: ThemeData(
-          primarySwatch: Colors.purple,
-          accentColor: Colors.deepOrange,
-          fontFamily: 'Lato',
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => Products(),
         ),
-        initialRoute: '/',
-        routes: {
-          '/' : (context) => ProductOverviewScreen(),
-          ProductDetail.routeName : (context)=> ProductDetail(),
-        }
-      ),
+        ChangeNotifierProvider(
+          create: (context) => Cart(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => Orders(),
+        ),
+      ],
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Shop App',
+          theme: ThemeData(
+            primarySwatch: Colors.purple,
+            accentColor: Colors.deepOrange,
+            fontFamily: 'Lato',
+          ),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => ProductOverviewScreen(),
+            ProductDetail.routeName: (context) => ProductDetail(),
+            CartScreen.routeName: (context) => CartScreen(),
+            OrdersScreen.routeName: (context) => OrdersScreen(),
+          }),
     );
   }
 }

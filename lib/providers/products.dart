@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../models/product.dart';
+import 'product.dart';
 class Products with ChangeNotifier{
   List<Product> _items =  [
     Product(
@@ -34,6 +34,15 @@ class Products with ChangeNotifier{
 
   List<Product> get items{
     return [..._items];
+  }
+
+  List<Product> get showFavorites{
+    return items.where((product) => product.isFavourite).toList();
+  }
+
+
+  Product findById(String id){
+    return items.firstWhere((item) => item.id == id);
   }
 
 }
