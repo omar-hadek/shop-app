@@ -7,11 +7,11 @@ import '/screens/cart_screen.dart';
 import '/providers/Cart.dart';
 import '/providers/products.dart';
 import './screens/orders_screen.dart';
+import './screens/user_products_screen.dart';
 
 void main() {
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
             ProductDetail.routeName: (context) => ProductDetail(),
             CartScreen.routeName: (context) => CartScreen(),
             OrdersScreen.routeName: (context) => OrdersScreen(),
+            UserProductsScreen.routeName: (context) => UserProductsScreen(),
           }),
     );
   }
