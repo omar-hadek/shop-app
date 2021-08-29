@@ -14,7 +14,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _descriptionFocusNode = FocusNode();
   final _imageUrlController = TextEditingController();
   final _imageUrlFocusNode = FocusNode();
-  final _titleFocusNode = FocusNode();
   var _editedProduct =
       Product(id: '', title: '', description: '', price: 0.0, imageUrl: '');
   final _form = GlobalKey<FormState>();
@@ -37,18 +36,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _saveForm() {
     final isValid = _form.currentState?.validate();
-    if(isValid != null&& !isValid){
+    if (isValid != null && !isValid) {
       return;
     }
     _form.currentState?.save();
-    print(_editedProduct.title);
-    print(_editedProduct.price);
-    print(_editedProduct.description);
-    print(_editedProduct.imageUrl);
   }
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if (!(_imageUrlController.text.startsWith('assets') ||
+              _imageUrlController.text.startsWith('asset')) ||
+          !(_imageUrlController.text.endsWith('jpg') ||
+              _imageUrlController.text.endsWith('png') ||
+              _imageUrlController.text.endsWith('jpeg'))) {
+        return;
+      }
+
       setState(() {});
     }
   }
@@ -69,6 +72,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         key: _form,
         child: ListView(
           children: [
+            // TITLE TEXT FIELD
             TextFormField(
               decoration: InputDecoration(
                 labelText: 'Title',
@@ -94,6 +98,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 FocusScope.of(context).requestFocus(_priceFocusNode);
               },
             ),
+            //PRICE TEXT FIELD
             TextFormField(
               decoration: InputDecoration(
                 labelText: 'Price',
@@ -117,9 +122,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 if (value!.isEmpty) {
                   return 'please provide a value';
                 }
+                if (double.tryParse(value) == null) {
+                  return 'Enter a valid Number';
+                }
                 return null;
               },
             ),
+            // DESCRIPTION TEXT FIELD
             TextFormField(
               decoration: InputDecoration(
                 labelText: 'Description',
@@ -140,12 +149,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 if (value!.isEmpty) {
                   return 'please provide a value';
                 }
+                if (value.length < 10) {
+                  return 'description must be at least 10 characters';
+                }
                 return null;
               },
             ),
+            //IMAGE AND URL FIELD
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                // IMAGE PREVIEW CONTAINER
                 Container(
                   margin: EdgeInsets.only(right: 5.0, top: 8.0),
                   width: 100.0,
@@ -159,6 +173,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           fit: BoxFit.cover,
                         ),
                 ),
+                //IMAGE URL TEXT FIELD
                 Expanded(
                   child: TextFormField(
                     decoration: InputDecoration(
@@ -182,6 +197,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     validator: (value) {
                       if (value!.isEmpty) {
                         return 'please provide a value';
+                      }
+                      if (!(value.startsWith('assets') ||
+                          value.startsWith('asset'))) {
+                        return 'please enter a valid URL !!';
+                      }
+                      if (!(value.endsWith('jpg') ||
+                          value.endsWith('png') ||
+                          value.endsWith('jpeg'))) {
+                        return 'please enter a valid image!!';
                       }
                       return null;
                     },

@@ -48,7 +48,7 @@ class ProductItem extends StatelessWidget {
             trailing: IconButton(
               icon: Icon(Icons.shopping_cart),
               onPressed: () {
-                cart.AddItem(product.id, product.title, 1, product.price);
+                cart.addItem(product.id, product.title, 1, product.price);
                 ScaffoldMessenger.of(context).removeCurrentSnackBar();
                 ScaffoldMessenger.of(context).showSnackBar(
                    SnackBar(

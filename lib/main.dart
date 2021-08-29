@@ -45,6 +45,6 @@ class MyApp extends StatelessWidget {
             UserProductsScreen.routeName: (context) => UserProductsScreen(),
             EditProductScreen.routeName: (context) => EditProductScreen(),
           }),
-    );
+    ); 
   }
 }
