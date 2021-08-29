@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'product.dart';
-class Products with ChangeNotifier{
-  List<Product> _items =  [
+
+class Products with ChangeNotifier {
+  List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -32,17 +33,26 @@ class Products with ChangeNotifier{
     ),
   ];
 
-  List<Product> get items{
+  List<Product> get items {
     return [..._items];
   }
 
-  List<Product> get showFavorites{
+  List<Product> get showFavorites {
     return items.where((product) => product.isFavourite).toList();
   }
 
-
-  Product findById(String id){
+  Product findById(String id) {
     return items.firstWhere((item) => item.id == id);
   }
 
+  void addProduct(Product product) {
+    final addedProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price);
+    _items.add(addedProduct);
+    notifyListeners();
+  }
 }
