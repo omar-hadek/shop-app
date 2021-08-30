@@ -10,7 +10,7 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<Products>(context);
+    final productsData = Provider.of<Products>(context).items;
     return Scaffold(
       appBar: AppBar(
         title: Text('USER PRODUCTS'),
@@ -22,13 +22,14 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       body: ListView.builder(
-        itemCount: productsData.items.length,
+        itemCount: productsData.length,
         itemBuilder: (context, i) {
           return Column(
             children: [
               UserProductItem(
-                  title: productsData.items[i].title,
-                  imageUrl: productsData.items[i].imageUrl),
+                  id: productsData[i].id,
+                  title: productsData[i].title,
+                  imageUrl: productsData[i].imageUrl),
               Divider(),
             ],
           );
