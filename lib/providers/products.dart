@@ -76,31 +76,46 @@ class Products with ChangeNotifier {
     }
   }
 
-  void editProduct(String id, Product product) {
+  Future<void> editProduct(String id, Product product) async {
     final productIndex = _items.indexWhere((prod) => prod.id == id);
     if (productIndex >= 0) {
-      _items[productIndex] = product;
-      notifyListeners();
+      try {
+        final url = Uri.https(
+            'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+            '/products/$id.json');
+
+        await http.patch(url,
+            body: json.encode({
+              'title': product.title,
+              'price': product.price,
+              'description': product.description,
+              'imageUrl': product.imageUrl,
+            }));
+        _items[productIndex] = product;
+        notifyListeners();
+      } catch (error) {
+        throw error;
+      }
     }
   }
 
-   Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts() async {
     final url = Uri.https(
         'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
         '/products.json');
     try {
       final response = await http.get(url);
-      final extractedProducts = json.decode(response.body) as Map<String,dynamic>;
+      final extractedProducts =
+          json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
       extractedProducts.forEach((prodId, prodData) {
         loadedProducts.add(Product(
-          id: prodId,
-          title: prodData['title'],
-          description: prodData['description'],
-          price: prodData['price'],
-          imageUrl: prodData['imageUrl'],
-          isFavourite: prodData['isFavorite']
-        ));
+            id: prodId,
+            title: prodData['title'],
+            description: prodData['description'],
+            price: prodData['price'],
+            imageUrl: prodData['imageUrl'],
+            isFavourite: prodData['isFavorite']));
       });
       _items = loadedProducts;
       notifyListeners();

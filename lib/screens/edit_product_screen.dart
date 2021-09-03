@@ -46,7 +46,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     _form.currentState?.save();
     setState(() {
-    _isLoading = true;
+      _isLoading = true;
     });
     if (_editedProduct.id.length <= 1) {
       try {
@@ -69,16 +69,33 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               );
             });
-      } finally {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
       }
     } else {
-      Provider.of<Products>(context, listen: false)
-          .editProduct(_editedProduct.id, _editedProduct);
+      await Provider.of<Products>(context, listen: false)
+          .editProduct(_editedProduct.id, _editedProduct)
+          .catchError((error) {
+        return showDialog<Null>(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('there is a problem !!'),
+                content: Text('somthing went wrong please try later'),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.cancel),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      });
       print('in edited' + _editedProduct.title);
+      setState(() {
+        _isLoading = false;
+        Navigator.of(context).pop();
+      });
     }
   }
 
@@ -206,7 +223,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                   // DESCRIPTION TEXT FIELD
                   TextFormField(
-                    initialValue: _initialValues['decription'],
+                    initialValue: _initialValues['description'],
                     decoration: InputDecoration(
                       labelText: 'Description',
                     ),
