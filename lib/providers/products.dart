@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'product.dart';
@@ -5,34 +7,34 @@ import 'dart:convert';
 
 class Products with ChangeNotifier {
   List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl: 'assets/images/product1.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl: 'assets/images/product2.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl: 'assets/images/product3.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl: 'assets/images/product4.jpg',
-    ),
+    // Product(
+    //   id: 'p1',
+    //   title: 'Red Shirt',
+    //   description: 'A red shirt - it is pretty red!',
+    //   price: 29.99,
+    //   imageUrl: 'assets/images/product1.jpg',
+    // ),
+    // Product(
+    //   id: 'p2',
+    //   title: 'Trousers',
+    //   description: 'A nice pair of trousers.',
+    //   price: 59.99,
+    //   imageUrl: 'assets/images/product2.jpg',
+    // ),
+    // Product(
+    //   id: 'p3',
+    //   title: 'Yellow Scarf',
+    //   description: 'Warm and cozy - exactly what you need for the winter.',
+    //   price: 19.99,
+    //   imageUrl: 'assets/images/product3.jpg',
+    // ),
+    // Product(
+    //   id: 'p4',
+    //   title: 'A Pan',
+    //   description: 'Prepare any meal you want.',
+    //   price: 49.99,
+    //   imageUrl: 'assets/images/product4.jpg',
+    // ),
   ];
 
   List<Product> get items {
@@ -79,6 +81,31 @@ class Products with ChangeNotifier {
     if (productIndex >= 0) {
       _items[productIndex] = product;
       notifyListeners();
+    }
+  }
+
+   Future<void> fetchAndSetProducts() async {
+    final url = Uri.https(
+        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+        '/products.json');
+    try {
+      final response = await http.get(url);
+      final extractedProducts = json.decode(response.body) as Map<String,dynamic>;
+      final List<Product> loadedProducts = [];
+      extractedProducts.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          imageUrl: prodData['imageUrl'],
+          isFavourite: prodData['isFavorite']
+        ));
+      });
+      _items = loadedProducts;
+      notifyListeners();
+    } catch (error) {
+      throw error;
     }
   }
 
