@@ -47,20 +47,19 @@ class Products with ChangeNotifier {
     return items.firstWhere((item) => item.id == id);
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     final url = Uri.https(
         'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
         '/products.json');
-    return http
-        .post(url,
-            body: json.encode({
-              'title': product.title,
-              'price': product.price,
-              'description': product.description,
-              'imageUrl': product.imageUrl,
-              'isFavorite': product.isFavourite,
-            }))
-        .then((response) {
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'title': product.title,
+            'price': product.price,
+            'description': product.description,
+            'imageUrl': product.imageUrl,
+            'isFavorite': product.isFavourite,
+          }));
       final addedProduct = Product(
           id: json.decode(response.body)["name"],
           title: product.title,
@@ -69,9 +68,10 @@ class Products with ChangeNotifier {
           price: product.price);
       _items.add(addedProduct);
       notifyListeners();
-    }).catchError((error){
-          throw error;
-    });
+    } catch (error) {
+      print(error.toString());
+      throw error;
+    }
   }
 
   void editProduct(String id, Product product) {
