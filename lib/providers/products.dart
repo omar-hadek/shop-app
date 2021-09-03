@@ -47,38 +47,43 @@ class Products with ChangeNotifier {
     return items.firstWhere((item) => item.id == id);
   }
 
-  void addProduct(Product product) {
-    final url = Uri.https('shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app', '/products.json');
-    http.post(url ,body: json.encode({
-      'title':product.title,
-      'price':product.price,
-      'description': product.description,
-      'imageUrl': product.imageUrl,
-      'isFavorite':product.isFavourite,
-    }));
-
-
-    final addedProduct = Product(
-        id: DateTime.now().toString(),
-        title: product.title,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price);
-    _items.add(addedProduct);
-    notifyListeners();
+  Future<void> addProduct(Product product) {
+    final url = Uri.https(
+        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+        '/products.json');
+    return http
+        .post(url,
+            body: json.encode({
+              'title': product.title,
+              'price': product.price,
+              'description': product.description,
+              'imageUrl': product.imageUrl,
+              'isFavorite': product.isFavourite,
+            }))
+        .then((response) {
+      final addedProduct = Product(
+          id: json.decode(response.body)["name"],
+          title: product.title,
+          description: product.description,
+          imageUrl: product.imageUrl,
+          price: product.price);
+      _items.add(addedProduct);
+      notifyListeners();
+    }).catchError((error){
+          throw error;
+    });
   }
 
-  void editProduct(String id,Product product){
+  void editProduct(String id, Product product) {
     final productIndex = _items.indexWhere((prod) => prod.id == id);
-    if(productIndex  >=0){
+    if (productIndex >= 0) {
       _items[productIndex] = product;
       notifyListeners();
     }
   }
 
-  void deleteProduct(String id){
+  void deleteProduct(String id) {
     _items.removeWhere((prod) => prod.id == id);
     notifyListeners();
-
   }
 }
