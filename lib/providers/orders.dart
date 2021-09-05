@@ -56,4 +56,35 @@ class Orders with ChangeNotifier {
     );
     notifyListeners();
   }
+
+  Future<void> fetchAndSetOrders() async {
+    final url = Uri.https(
+        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+        '/orders.json');
+    final response = await http.get(url);
+    if(json.decode(response.body) == null){
+       return;
+    }
+    final extractedOrders = json.decode(response.body) as Map<String, dynamic>;
+    List<OrderItem> loadedOrders = [];
+    extractedOrders.forEach((id, value) {
+      loadedOrders.add(
+        OrderItem(
+          id: id,
+          amount: value['amount'],
+          products: (value['products'] as List<dynamic>).map((item) {
+            return CartItem(
+                id: item['id'],
+                title: item['title'],
+                quantity: item['quantity'],
+                price: item['price']);
+          }).toList(),
+          date: DateTime.parse(value['date']),
+        ),
+      );
+    });
+
+    _orders = loadedOrders;
+    notifyListeners();
+  }
 }
