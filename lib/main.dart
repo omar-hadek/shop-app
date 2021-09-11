@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/providers/orders.dart';
@@ -15,24 +16,29 @@ import './screens/auth_screen.dart';
 void main() {
   runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Auth()),
-        ChangeNotifierProvider(
-          create: (context) => Products(),
+          create: (context) => Auth(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => Cart(),
+        ChangeNotifierProxyProvider<Auth,Products>(
+          create: (context) => Products(null,[]),
+          update: (context,auth,previourProducts)=>Products(auth.token,previourProducts!.items)
+          
         ),
-        ChangeNotifierProvider(
-          create: (context) => Orders(),
+        ChangeNotifierProvider.value(
+          value: Cart(),
+        ),
+        ChangeNotifierProvider.value(
+          value:Orders(),
         ),
       ],
-      child: MaterialApp(
+      child: Consumer<Auth>(
+        builder: (ctx, authData, child) => MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Shop App',
           theme: ThemeData(
@@ -40,16 +46,19 @@ class MyApp extends StatelessWidget {
             accentColor: Colors.deepOrange,
             fontFamily: 'Lato',
           ),
-          initialRoute: AuthScreen.routeName,
+          home: authData.isAuth ? ProductOverviewScreen() : AuthScreen(),
           routes: {
             AuthScreen.routeName: (context) => AuthScreen(),
-            '/': (context) => ProductOverviewScreen(),
+            ProductOverviewScreen.routeName: (context) =>
+                ProductOverviewScreen(),
             ProductDetail.routeName: (context) => ProductDetail(),
             CartScreen.routeName: (context) => CartScreen(),
             OrdersScreen.routeName: (context) => OrdersScreen(),
             UserProductsScreen.routeName: (context) => UserProductsScreen(),
             EditProductScreen.routeName: (context) => EditProductScreen(),
-          }),
-    ); 
+          },
+        ),
+      ),
+    );
   }
 }
