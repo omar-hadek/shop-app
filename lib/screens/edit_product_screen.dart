@@ -63,6 +63,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   IconButton(
                     icon: Icon(Icons.cancel),
                     onPressed: () {
+                      setState(() {
+                        _isLoading = false;
+                      });
                       Navigator.of(context).pop();
                     },
                   ),
@@ -84,6 +87,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   IconButton(
                     icon: Icon(Icons.cancel),
                     onPressed: () {
+                      setState(() {
+                        _isLoading = false;
+                      });
                       Navigator.of(context).pop();
                     },
                   ),

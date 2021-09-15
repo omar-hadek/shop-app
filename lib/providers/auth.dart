@@ -21,10 +21,14 @@ class Auth extends ChangeNotifier {
     return null;
   }
 
+  String? get userId{
+    return _userId;
+  }
+
   Future<void> _register(
       String? email, String? password, String queryString) async {
     final url = Uri.parse(
-        'https://identitytoolkit.googleapis.com/v1/accounts:${queryString}?key=AIzaSyAteSP9CcwvPNsampuT0fzHB1vOsjit9-U');
+        'https://identitytoolkit.googleapis.com/v1/accounts:$queryString?key=AIzaSyAteSP9CcwvPNsampuT0fzHB1vOsjit9-U');
     try {
       final response = await http.post(url,
           body: json.encode({

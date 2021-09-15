@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/providers/orders.dart';
@@ -25,17 +24,19 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => Auth(),
         ),
-        ChangeNotifierProxyProvider<Auth,Products>(
-          create: (context) => Products(null,[]),
-          update: (context,auth,previourProducts)=>Products(auth.token,previourProducts!.items)
-          
-        ),
+        ChangeNotifierProxyProvider<Auth, Products>(
+            create: (context) => Products(null, []),
+            update: (context, auth, previourProducts) => Products(auth.token,
+                previourProducts == null ? [] : previourProducts.items)),
         ChangeNotifierProvider.value(
           value: Cart(),
         ),
-        ChangeNotifierProvider.value(
-          value:Orders(),
-        ),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+            create: (context) => Orders([], null,null),
+            update: (context, auth, previousOrders) => Orders(
+                previousOrders == null ? [] : previousOrders.orders,
+                auth.token,
+                auth.userId)),
       ],
       child: Consumer<Auth>(
         builder: (ctx, authData, child) => MaterialApp(
