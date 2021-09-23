@@ -15,7 +15,7 @@ class Auth extends ChangeNotifier {
   }
 
   String? get token {
-    if (_expiryDate!.isAfter(DateTime.now()) && _token != null) {
+    if (_token != null) {
       return _token;
     }
     return null;
@@ -63,7 +63,6 @@ class Auth extends ChangeNotifier {
   void logOut(){
     _userId = null;
     _token = null;
-    _expiryDate = null;
     notifyListeners();
   }
 }
