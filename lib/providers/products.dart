@@ -6,8 +6,9 @@ import 'dart:convert';
 
 class Products with ChangeNotifier {
   final String? userToken;
+  final String? userId;
 
-  Products(this.userToken, this._items);
+  Products(this.userToken, this._items, this.userId);
 
   List<Product> _items = [];
 
@@ -29,7 +30,8 @@ class Products with ChangeNotifier {
     if (userToken != null) {
       url = Uri.https(
           'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products.json',{'auth':userToken});
+          '/products.json',
+          {'auth': userToken});
     }
 
     if (userToken == null) {
@@ -45,13 +47,15 @@ class Products with ChangeNotifier {
             'description': product.description,
             'imageUrl': product.imageUrl,
             'isFavorite': product.isFavourite,
+            'creatorId': userId
           }));
       final addedProduct = Product(
-          id: json.decode(response.body)["name"],
-          title: product.title,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: product.price);
+        id: json.decode(response.body)["name"],
+        title: product.title,
+        description: product.description,
+        imageUrl: product.imageUrl,
+        price: product.price,
+      );
       _items.add(addedProduct);
       notifyListeners();
     } catch (error) {
@@ -68,7 +72,8 @@ class Products with ChangeNotifier {
         if (userToken != null) {
           url = Uri.https(
               'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-              '/products/$id.json',{'auth':userToken});
+              '/products/$id.json',
+              {'auth': userToken});
         }
 
         if (userToken == null) {
@@ -92,23 +97,32 @@ class Products with ChangeNotifier {
     }
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool isFilterByUser = false]) async {
+    final response;
+    var extractedProducts;
     var url;
-    if (userToken != null) {
-      url = Uri.https(
-          'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products.json',{'auth':userToken});
-    }
 
-    if (userToken == null) {
-      url = Uri.https(
-          'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products.json');
+
+    if (userToken != null) {
+      url = isFilterByUser? Uri.parse(
+          'https://shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$userToken&orderBy="creatorId"&equalTo="$userId"'):
+          Uri.parse(
+          'https://shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$userToken');
+
+          // url = Uri.https(
+          // 'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+          // '/products.json', {'auth': userToken});
+      response = await http.get(url);
+      extractedProducts = json.decode(response.body) as Map<String, dynamic>;
     }
+    url = Uri.https(
+        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+        '/userFavirites/$userId.json',
+        {'auth': userToken});
+
+    final favoriteResponse = await http.get(url);
+    var favoriteData = json.decode(favoriteResponse.body);
     try {
-      final response = await http.get(url);
-      final extractedProducts =
-          json.decode(response.body) as Map<String, dynamic>;
       final List<Product> loadedProducts = [];
       extractedProducts.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -117,7 +131,8 @@ class Products with ChangeNotifier {
             description: prodData['description'],
             price: prodData['price'],
             imageUrl: prodData['imageUrl'],
-            isFavourite: prodData['isFavorite']));
+            isFavourite:
+                favoriteData == null ? false : favoriteData[userId] ?? false));
       });
       _items = loadedProducts;
       notifyListeners();
@@ -128,17 +143,17 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     var url;
-    if(userToken != null ){
+    if (userToken != null) {
       url = Uri.https(
-        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products/$id.json',{'auth':userToken});
+          'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+          '/products/$id.json',
+          {'auth': userToken});
     }
 
-    if(userToken == null){
+    if (userToken == null) {
       url = Uri.https(
-        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products/$id.json');
-
+          'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
+          '/products/$id.json');
     }
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
