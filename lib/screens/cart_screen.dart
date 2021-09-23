@@ -86,7 +86,6 @@ class _OrderButtonState extends State<OrderButton> {
             _isLoading  = false;
          });   
         widget.cart.clear();
-        Navigator.of(context).pushNamed(OrdersScreen.routeName);
       },
       child:_isLoading? Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

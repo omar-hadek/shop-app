@@ -7,15 +7,15 @@ import 'package:myshop/models/http_exeption.dart';
 
 class Auth extends ChangeNotifier {
   String? _token;
-  DateTime _expiryDate = DateTime.now();
-  late String _userId;
+  DateTime? _expiryDate = DateTime.now();
+  String? _userId;
 
   bool get isAuth {
     return token != null;
   }
 
   String? get token {
-    if (_expiryDate.isAfter(DateTime.now()) && _token != null) {
+    if (_expiryDate!.isAfter(DateTime.now()) && _token != null) {
       return _token;
     }
     return null;
@@ -57,5 +57,13 @@ class Auth extends ChangeNotifier {
 
   Future<void> signIn(String? email, String? password) {
     return _register(email, password, 'signInWithPassword');
+  }
+
+
+  void logOut(){
+    _userId = null;
+    _token = null;
+    _expiryDate = null;
+    notifyListeners();
   }
 }

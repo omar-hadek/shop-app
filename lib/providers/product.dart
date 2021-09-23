@@ -29,12 +29,6 @@ class Product with ChangeNotifier {
           '/userFavirites/$userId/$id.json',
           {'auth': userToken});
     }
-
-    if (userToken == null) {
-      url = Uri.https(
-          'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products/$id.json');
-    }
     try {
       final response = await http.put(url,
           body: json.encode(

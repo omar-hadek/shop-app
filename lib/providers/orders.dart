@@ -28,18 +28,11 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(List<CartItem> products, double total) async {
-    var url;
-    if(userToken != null){
-       url = Uri.https(
+    var url
+     = Uri.https(
         'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/orders.json',{'auth':userToken});
+        '/orders/$userId.json',{'auth':userToken});
 
-    }
-    if(userToken == null){
-       url = Uri.https(
-        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/orders.json');
-    }
 
    
     final timestamp = DateTime.now();
@@ -73,18 +66,10 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchAndSetOrders() async {
-    var url;
-    if(userToken != null){
-       url = Uri.https(
+    var url
+     = Uri.https(
         'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/orders.json',{'auth':userToken});
-
-    }
-    if(userToken == null){
-       url = Uri.https(
-        'shop-app-c4357-default-rtdb.europe-west1.firebasedatabase.app',
-        '/orders.json');
-    }
+        '/orders/$userId.json',{'auth':userToken});
 
     print(userToken);
     final response = await http.get(url);
